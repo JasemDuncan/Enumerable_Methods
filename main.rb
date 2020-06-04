@@ -90,12 +90,15 @@ module Enumerable
     count
   end
 
-  def my_map
-    return enum_for unless block_given?
-
+  def my_map(my_proc = nil)
+    using_proc = !my_proc.nil?
     array = []
     self.my_each do |x|
-      array.push yield(x)
+      if using_proc
+        array.push my_proc.call(x)
+      else
+        array.push yield(x)
+      end
     end
     array 
   end
@@ -125,8 +128,15 @@ def multiply_els(arr)
    arr.my_inject {|a,b| a*b} 
 end
 
-time=Time.new
-puts time.min
+my_proc = Proc.new {  |i| i*i }
+# puts "without proc"
+# print (1..4).my_map {  |i| i*i }
+# puts ""
+# puts "============="
+# puts "with proc"
+# print (1..4).my_map(my_proc) { |i| i+i }
+# puts ""
+
 # puts (5..10).my_inject(1){ |sum,num| sum + num}         #=> 45
 # # puts (5..10).inject{ |sum,num| sum + num}         #=> 45
 # (5..10).my_each{ |x| puts x}         #=> 45
