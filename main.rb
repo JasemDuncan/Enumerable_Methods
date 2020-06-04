@@ -119,25 +119,16 @@ module Enumerable
     end
   end
 
-
-  # def my_inject(*args)
-  #   list = is_a?(Range) ? to_a : self
-
-  #   reduce = args[0] if args[0].is_a?(Integer)
-  #   operator = args[0].is_a?(Symbol) ? args[0] : args[1]
-
-  #   if operator
-  #     list.my_each { |item| reduce = reduce ? reduce.send(operator, item) : item }
-  #     return reduce
-  #   end
-  #   list.my_each { |item| reduce = reduce ? yield(reduce, item) : item }
-  #   reduce
-  # end
-
 end
-puts "result"
-puts (5..10).my_inject(1){ |sum,num| sum + num}         #=> 45
-# puts (5..10).inject{ |sum,num| sum + num}         #=> 45
+
+def multiply_els(arr)
+   arr.my_inject {|a,b| a*b} 
+end
+
+time=Time.new
+puts time.min
+# puts (5..10).my_inject(1){ |sum,num| sum + num}         #=> 45
+# # puts (5..10).inject{ |sum,num| sum + num}         #=> 45
 # (5..10).my_each{ |x| puts x}         #=> 45
 # puts (5..10).my_inject(1) { |sum, n| sum + n } 
 # puts (5..10).my_inject { |product, n| product * n } #=> 151200
