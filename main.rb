@@ -1,13 +1,9 @@
-# frozen_string_literal: true
-
 module Enumerable
   def my_each
     return enum_for unless block_given?
 
     arr = self
-    if arr.is_a?(Range)
-      arr = self.to_a
-    end
+    arr = to_a if arr.is_a?(Range)
     count = 0
     while count < arr.size
       yield arr[count]
@@ -38,14 +34,16 @@ module Enumerable
 
   def my_all?(*args)
     arr = self
-    if(args[0])
+    if args[0]
       arr.my_each do |x|
         return false unless x == args[0]
+
         return true
       end
     else
       arr.my_each do |x|
         return false unless yield(x)
+
         return true
       end
     end
@@ -53,38 +51,36 @@ module Enumerable
 
   def my_any?(*args)
     arr = self
-    if(args[0])
+    if args[0]
       arr.my_each do |x|
         return true unless x == args[0]
+
         return false
       end
     else
       arr.my_each do |x|
         return true unless yield(x)
+
         return false
       end
     end
   end
 
   def my_none?
-    !self.my_any?
+    !my_any?
   end
 
   def my_count(*args)
-    count = 0;
-    if(args[0])
-      self.my_each do |x| 
-        if x == args[0] 
-          count += 1
-        end 
+    count = 0
+    if args[0]
+      my_each do |x|
+        count += 1 if x == args[0]
       end
     elsif !block_given?
-      count = self.size
-    elsif(!args[0])
-      my_each do|x| 
-        if yield x 
-          count += 1
-        end
+      count = size
+    elsif !args[0]
+      my_each do |x|
+        count += 1 if yield x
       end
     end
     count
@@ -93,56 +89,34 @@ module Enumerable
   def my_map(my_proc = nil)
     using_proc = !my_proc.nil?
     array = []
-    self.my_each do |x|
+    my_each do |x|
       if using_proc
         array.push my_proc.call(x)
       else
         array.push yield(x)
       end
     end
-    array 
+    array
   end
 
   def my_inject(*args)
-    array = self
-    if self.is_a?(Range)
-      array = self.to_a
-    end
+    return unless block_given?
 
-    if block_given?
-      start = args[0] if args[0].is_a?(Integer)
-      array.my_each do |num| 
-        if start = start
-          start = yield(start, num)
-        else
-          start = num
-        end 
+    array = self
+    array = to_a if is_a?(Range)
+
+    start = args[0] if args[0].is_a?(Integer)
+    array.my_each do |num|
+      if (start = start)
+        yield(start, num)
+      else
+        num
       end
-      return start
+      start
     end
   end
-
 end
 
 def multiply_els(arr)
-   arr.my_inject {|a,b| a*b} 
+  arr.my_inject { |a, b| a * b }
 end
-
-my_proc = Proc.new {  |i| i*i }
-# puts "without proc"
-# print (1..4).my_map {  |i| i*i }
-# puts ""
-# puts "============="
-# puts "with proc"
-# print (1..4).my_map(my_proc) { |i| i+i }
-# puts ""
-
-# puts (5..10).my_inject(1){ |sum,num| sum + num}         #=> 45
-# # puts (5..10).inject{ |sum,num| sum + num}         #=> 45
-# (5..10).my_each{ |x| puts x}         #=> 45
-# puts (5..10).my_inject(1) { |sum, n| sum + n } 
-# puts (5..10).my_inject { |product, n| product * n } #=> 151200
-# [1,2,3].my_each {|i| print "-#{i}- "}
-# [4,3,2].my_each_with_index {|i,index| puts "-index #{index} : #{i}- "}
-# print [1, 2, 3, 4, 5].my_all?(&:even?)
-# print [1, 3, 5, 9].my_any?(&:even?)
