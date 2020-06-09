@@ -48,7 +48,7 @@ module Enumerable
       end
     else
       arr.my_each do |x|
-        is_all = false if x.nil?
+        is_all = false if !x
       end
     end
     is_all
@@ -67,7 +67,7 @@ module Enumerable
       end
     else
       arr.my_each do |x|
-        is_any = true unless x.nil?
+        is_any = true unless !x
       end
     end
     is_any
@@ -124,19 +124,35 @@ module Enumerable
   end
 
   def my_inject(*args)
-    return unless block_given?
-
     array = self
     array = to_a if is_a?(Range)
     start = args[0] if args[0].is_a?(Integer)
-    array.my_each do |num|
-      start = if start
-                yield(start, num)
-              else
-                num
-              end
+    is_symbol = args[0].is_a?(Symbol) || args[1].is_a?(Symbol)
+    if is_symbol
+      if args[1].is_a?(Symbol)
+        symbol = args[1]
+        start = args[0]  
+      else
+        symbol = args[0]
+      end
+      array.my_each do |num|
+        if start
+          start = eval(start.to_s + symbol.to_s + num.to_s)
+        else
+          start = num
+        end
+      end
+      return start
     end
-    start
+    
+    array.my_each do |num|
+      if start
+        start = yield(start, num)
+      else
+        start = num
+      end
+    end
+    return start
   end
 end
 # rubocop:enable Metrics/ModuleLength
@@ -144,3 +160,8 @@ end
 def multiply_els(arr)
   arr.my_inject { |a, b| a * b }
 end
+
+# Sum some numbers
+puts (5..10).my_inject(:+)                             #=> 45
+# Same using a block and inject
+# puts (5..10).my_inject(1) { |sum, n| sum + n }            #=> 45
