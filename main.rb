@@ -1,4 +1,5 @@
 # rubocop:disable Metrics/ModuleLength
+
 module Enumerable
   def my_each
     return enum_for unless block_given?
@@ -35,6 +36,11 @@ module Enumerable
     array_with_selection
   end
 
+  # rubocop:disable Metrics/MethodLength
+  # rubocop:disable Metrics/CyclomaticComplexity
+  # rubocop:disable Metrics/PerceivedComplexity
+
+  
   def my_all?(*args)
     arr = self
     is_all = true
@@ -110,6 +116,9 @@ module Enumerable
     !is_any
   end
 
+  # rubocop:enable Metrics/MethodLength
+  # rubocop:enable Metrics/CyclomaticComplexity
+  # rubocop:enable Metrics/PerceivedComplexity
   def my_count(*args)
     count = 0
     if args[0]
@@ -141,6 +150,10 @@ module Enumerable
     array
   end
 
+  # rubocop:disable Security/Eval
+  # rubocop:disable Style/ConditionalAssignment
+  # rubocop:disable Metrics/PerceivedComplexity
+  # rubocop:disable Metrics/CyclomaticComplexity:
   def my_inject(*args)
     array = self
     array = to_a if is_a?(Range)
@@ -149,29 +162,24 @@ module Enumerable
     if is_symbol
       if args[1].is_a?(Symbol)
         symbol = args[1]
-        start = args[0]  
+        start = args[0]
       else
         symbol = args[0]
       end
       array.my_each do |num|
-        if start
-          start = eval(start.to_s + symbol.to_s + num.to_s)
-        else
-          start = num
-        end
+        start ? start = eval(start.to_s + symbol.to_s + num.to_s) : start = num
       end
       return start
     end
-    
     array.my_each do |num|
-      if start
-        start = yield(start, num)
-      else
-        start = num
-      end
+      start ? start = yield(start, num) : start = num
     end
-    return start
+    start
   end
+  # rubocop:enable Security/Eval
+  # rubocop:enable Style/ConditionalAssignment
+  # rubocop:enable Metrics/PerceivedComplexity
+  # rubocop:enable Metrics/CyclomaticComplexity:
 end
 # rubocop:enable Metrics/ModuleLength
 
