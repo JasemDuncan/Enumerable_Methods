@@ -40,7 +40,6 @@ module Enumerable
   # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/PerceivedComplexity
 
-  
   def my_all?(*args)
     arr = self
     is_all = true
@@ -53,14 +52,14 @@ module Enumerable
         else
           is_all = false unless args[0] == x
         end
-      end 
+      end
     elsif block_given?
       arr.my_each do |x|
         is_all = false unless yield(x)
       end
     else
       arr.my_each do |x|
-        is_all = false if !x
+        is_all = false unless x
       end
     end
     is_all
@@ -71,21 +70,21 @@ module Enumerable
     is_any = false
     if !args[0].nil?
       arr.my_each do |x|
-        if args[0].is_a?(Class)
-          is_any = true if x.is_a?(args[0])
-        elsif args[0].is_a?(Regexp)
-          is_any = true if args[0].match?(x)
-        else
-          is_any = true if args[0] == x
+        if args[0].is_a?(Class) && x.is_a?(args[0])
+          is_any = true
+        elsif args[0].is_a?(Regexp) && args[0].match?(x)
+          is_any = true
+        elsif args[0] == x
+          is_any = true
         end
-      end 
+      end
     elsif block_given?
       arr.my_each do |x|
         is_any = true if yield(x)
       end
     else
       arr.my_each do |x|
-        is_any = true unless !x
+        is_any = true if x
       end
     end
     is_any
@@ -96,12 +95,12 @@ module Enumerable
     is_any = false
     if !args[0].nil?
       arr.my_each do |x|
-        if args[0].is_a?(Class)
-          is_any = true if x.is_a?(args[0])
-        elsif args[0].is_a?(Regexp)
-          is_any = true if args[0].match?(x)
-        else
-          is_any = true if args[0] == x
+        if args[0].is_a?(Class) && x.is_a?(args[0])
+          is_any = true
+        elsif args[0].is_a?(Regexp) && args[0].match?(x)
+          is_any = true
+        elsif args[0] == x
+          is_any = true
         end
       end
     elsif block_given?
