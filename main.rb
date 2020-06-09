@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/ModuleLength
 module Enumerable
   def my_each
     return enum_for unless block_given?
@@ -9,6 +10,7 @@ module Enumerable
       yield arr[count]
       count += 1
     end
+    arr
   end
 
   def my_each_with_index
@@ -20,10 +22,11 @@ module Enumerable
       yield arr[count], count
       count += 1
     end
+    arr
   end
 
   def my_select
-    return enum_for unless block_given? # if !block_given? return enum_for
+    return enum_for unless block_given?
 
     array_with_selection = []
     my_each do |x|
@@ -34,40 +37,59 @@ module Enumerable
 
   def my_all?(*args)
     arr = self
-    if args[0]
+    is_all = true
+    if !args[0].nil?
       arr.my_each do |x|
-        return false unless x == args[0]
-
-        return true
+        is_all = false unless args[0] == x
+      end
+    elsif block_given?
+      arr.my_each do |x|
+        is_all = false unless yield(x)
       end
     else
       arr.my_each do |x|
-        return false unless yield(x)
-
-        return true
+        is_all = false if x.nil?
       end
     end
+    is_all
   end
 
   def my_any?(*args)
     arr = self
-    if args[0]
+    is_any = false
+    if !args[0].nil?
       arr.my_each do |x|
-        return true unless x == args[0]
-
-        return false
+        is_any = true if args[0] == x
+      end
+    elsif block_given?
+      arr.my_each do |x|
+        is_any = true if yield(x)
       end
     else
       arr.my_each do |x|
-        return true unless yield(x)
-
-        return false
+        is_any = true unless x.nil?
       end
     end
+    is_any
   end
 
-  def my_none?
-    !my_any?
+  def my_none?(*args)
+    arr = self
+    is_any = false
+    if !args[0].nil?
+      arr.my_each do |x|
+        is_any = true if args[0] == x
+      end
+    elsif block_given?
+      arr.my_each do |x|
+        is_any = true if yield(x)
+      end
+    else
+      arr.my_each do |x|
+        is_any = true if x
+      end
+    end
+    !is_any
   end
 
   def my_count(*args)
@@ -87,6 +109,8 @@ module Enumerable
   end
 
   def my_map(my_proc = nil)
+    return enum_for unless block_given?
+
     using_proc = !my_proc.nil?
     array = []
     my_each do |x|
@@ -104,18 +128,18 @@ module Enumerable
 
     array = self
     array = to_a if is_a?(Range)
-
     start = args[0] if args[0].is_a?(Integer)
     array.my_each do |num|
-      if (start = start)
-        yield(start, num)
-      else
-        num
-      end
-      start
+      start = if start
+                yield(start, num)
+              else
+                num
+              end
     end
+    start
   end
 end
+# rubocop:enable Metrics/ModuleLength
 
 def multiply_els(arr)
   arr.my_inject { |a, b| a * b }
