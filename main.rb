@@ -40,8 +40,14 @@ module Enumerable
     is_all = true
     if !args[0].nil?
       arr.my_each do |x|
-        is_all = false unless args[0] == x
-      end
+        if args[0].is_a?(Class)
+          is_all = false unless x.is_a?(args[0])
+        elsif args[0].is_a?(Regexp)
+          is_all = false unless args[0].match?(x)
+        else
+          is_all = false unless args[0] == x
+        end
+      end 
     elsif block_given?
       arr.my_each do |x|
         is_all = false unless yield(x)
@@ -59,8 +65,14 @@ module Enumerable
     is_any = false
     if !args[0].nil?
       arr.my_each do |x|
-        is_any = true if args[0] == x
-      end
+        if args[0].is_a?(Class)
+          is_any = true if x.is_a?(args[0])
+        elsif args[0].is_a?(Regexp)
+          is_any = true if args[0].match?(x)
+        else
+          is_any = true if args[0] == x
+        end
+      end 
     elsif block_given?
       arr.my_each do |x|
         is_any = true if yield(x)
@@ -78,7 +90,13 @@ module Enumerable
     is_any = false
     if !args[0].nil?
       arr.my_each do |x|
-        is_any = true if args[0] == x
+        if args[0].is_a?(Class)
+          is_any = true if x.is_a?(args[0])
+        elsif args[0].is_a?(Regexp)
+          is_any = true if args[0].match?(x)
+        else
+          is_any = true if args[0] == x
+        end
       end
     elsif block_given?
       arr.my_each do |x|
@@ -160,8 +178,3 @@ end
 def multiply_els(arr)
   arr.my_inject { |a, b| a * b }
 end
-
-# Sum some numbers
-puts (5..10).my_inject(:+)                             #=> 45
-# Same using a block and inject
-# puts (5..10).my_inject(1) { |sum, n| sum + n }            #=> 45
