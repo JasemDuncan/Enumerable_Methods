@@ -4,26 +4,25 @@ module Enumerable
   def my_each
     return enum_for unless block_given?
 
-    arr = self
-    arr = to_a if arr.is_a?(Range)
+    arr = to_a
     count = 0
     while count < arr.size
       yield arr[count]
       count += 1
     end
-    arr
+    self
   end
 
   def my_each_with_index
     return enum_for unless block_given?
 
     count = 0
-    arr = self
+    arr = to_a
     while count < arr.size
       yield arr[count], count
       count += 1
     end
-    arr
+    self
   end
 
   def my_select
